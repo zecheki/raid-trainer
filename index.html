@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shield Orb Trainer</title>
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="game-panel">
+      <div class="title-row">
+        <div>
+          <h1>Shield Orb Trainer</h1>
+          <p>혼자 연습하는 레이드 쉴드/구슬 기믹</p>
+        </div>
+        <div class="controls-hint">
+          <span>WASD / 방향키</span>
+          <span>Space</span>
+          <span>R</span>
+        </div>
+      </div>
+
+      <canvas id="gameCanvas" width="960" height="640" aria-label="Shield Orb Trainer canvas"></canvas>
+    </section>
+
+    <aside class="hud" id="gameUi">
+      <h2>상태</h2>
+      <dl>
+        <div>
+          <dt>현재 상태</dt>
+          <dd data-ui="state">초기화 중</dd>
+        </div>
+        <div>
+          <dt>현재 목표 쉴드</dt>
+          <dd data-ui="targetShield">-</dd>
+        </div>
+        <div>
+          <dt>남은 쉴드 수</dt>
+          <dd data-ui="shieldCount">-</dd>
+        </div>
+        <div>
+          <dt>다음 장판까지</dt>
+          <dd data-ui="nextBeam">-</dd>
+        </div>
+        <div>
+          <dt>장판 횟수</dt>
+          <dd data-ui="beamCount">-</dd>
+        </div>
+        <div>
+          <dt>성공률</dt>
+          <dd data-ui="successRate">-</dd>
+        </div>
+        <div>
+          <dt>담당 라인 각도</dt>
+          <dd data-ui="laneAngles">-</dd>
+        </div>
+      </dl>
+
+      <section class="guide">
+        <h2>조작</h2>
+        <p><kbd>Space</kbd> 시작 / 다음 시도</p>
+        <p><kbd>R</kbd> 현재 시도 리셋</p>
+        <p><kbd>WASD</kbd> 또는 <kbd>방향키</kbd> 이동</p>
+      </section>
+
+      <section>
+        <h2>최근 결과 로그</h2>
+        <ol class="log-list" data-ui="logs"></ol>
+      </section>
+    </aside>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
