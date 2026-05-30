@@ -61,22 +61,26 @@ export class ShieldOrbMechanic {
     }
 
     for (const laneIndex of this.activeLaneIndices) {
+      const colorsForLane = shuffle([...COLOR_ORDER]);
+
       for (let i = 0; i < orbCountPerLane; i += 1) {
         const distanceOffset = i * orbSpacing;
-        this.spawnOrb(laneIndex, distanceOffset);
+        const colorId = colorsForLane[i % colorsForLane.length];
+
+        this.spawnOrb(laneIndex, distanceOffset, colorId);
       }
     }
 
     this.spawnCooldown = MECHANIC.ORB_SPAWN_INTERVAL;
   }
 
-  spawnOrb(laneIndex = randomItem(this.activeLaneIndices), distanceOffset = 0) {
+  spawnOrb(laneIndex = randomItem(this.activeLaneIndices), distanceOffset = 0, forcedColorId = null) {
     if (laneIndex === undefined) {
       return;
     }
 
     const angle = laneAngle(laneIndex, MECHANIC.LANE_COUNT);
-    const colorId = randomItem(COLOR_ORDER) ?? 'red';
+    const colorId = forcedColorId ?? randomItem(COLOR_ORDER) ?? 'red';
 
     this.orbs.push(
       new Orb({
