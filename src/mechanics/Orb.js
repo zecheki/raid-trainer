@@ -3,7 +3,7 @@ import { angleToPoint, normalize } from '../core/math.js';
 import { drawCircle, drawText } from '../render/draw.js';
 
 export class Orb {
-  constructor({ laneIndex, laneAngleDegrees, colorId }) {
+  constructor({ laneIndex, laneAngleDegrees, colorId, distanceOffset = 0 }) {
     this.laneIndex = laneIndex;
     this.laneAngleDegrees = laneAngleDegrees;
     this.colorId = colorId;
@@ -12,12 +12,13 @@ export class Orb {
     this.wasBeamHit = false;
     this.beamHitFlashTime = 0;
 
-    const start = angleToPoint(
-      ARENA.CENTER_X,
-      ARENA.CENTER_Y,
-      laneAngleDegrees,
-      MECHANIC.ORB_START_DISTANCE,
-    );
+  const start = angleToPoint(
+    ARENA.CENTER_X,
+    ARENA.CENTER_Y,
+    laneAngleDegrees,
+    MECHANIC.ORB_START_DISTANCE + distanceOffset,
+  );
+    
     this.x = start.x;
     this.y = start.y;
 

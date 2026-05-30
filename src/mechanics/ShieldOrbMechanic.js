@@ -49,28 +49,43 @@ export class ShieldOrbMechanic {
     const second = (first + 1) % MECHANIC.LANE_COUNT;
     return [first, second];
   }
-
+  
   spawnInitialOrbs() {
-    if (this.spawnedOrbWaves >= MECHANIC.MAX_ORB_WAVES) {
+    const orbCountPerLane = 3;
+    const orbSpacing = 32;
+
+    this.orbs = [];
+
+    if (!Array.isArray(this.activeLaneIndices) || this.activeLaneIndices.length === 0) {
       return;
     }
 
     for (const laneIndex of this.activeLaneIndices) {
-      this.spawnOrb(laneIndex);
+      for (let i = 0; i < orbCountPerLane; i += 1) {
+        const distanceOffset = i * orbSpacing;
+        this.spawnOrb(laneIndex, distanceOffset);
+      }
     }
 
-    this.spawnedOrbWaves += 1;
     this.spawnCooldown = MECHANIC.ORB_SPAWN_INTERVAL;
   }
 
-  spawnOrb(laneIndex = randomItem(this.activeLaneIndices)) {
+  spawnOrb(laneIndex = randomItem(this.activeLaneIndices), distanceOffset = 0) {
     if (laneIndex === undefined) {
       return;
     }
 
     const angle = laneAngle(laneIndex, MECHANIC.LANE_COUNT);
     const colorId = randomItem(COLOR_ORDER) ?? 'red';
-    this.orbs.push(new Orb({ laneIndex, laneAngleDegrees: angle, colorId }));
+
+    this.orbs.push(
+      new Orb({
+        laneIndex,
+        laneAngleDegrees: angle,
+        colorId,
+        distanceOffset,
+      }),
+    );
   }
 
   update(deltaSeconds, playerPosition) {
@@ -88,20 +103,7 @@ export class ShieldOrbMechanic {
   }
 
   updateOrbSpawn(deltaSeconds) {
-    if (this.spawnedOrbWaves >= MECHANIC.MAX_ORB_WAVES) {
-      return;
-    }
-
-    this.spawnCooldown -= deltaSeconds;
-
-    if (this.spawnCooldown <= 0) {
-      for (const laneIndex of this.activeLaneIndices) {
-        this.spawnOrb(laneIndex);
-      }
-
-      this.spawnedOrbWaves += 1;
-      this.spawnCooldown += MECHANIC.ORB_SPAWN_INTERVAL;
-    }
+    return;
   }
 
   updateBeamTimer(deltaSeconds, playerPosition) {
