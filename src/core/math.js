@@ -30,8 +30,18 @@ export function radiansToDegrees(radians) {
   return (radians * 180) / Math.PI;
 }
 
-export function laneAngle(index, laneCount = 12) {
-  return -90 + (360 / laneCount) * index;
+export function laneAngle(laneIndex, laneCount = 12, angleGaps = null) {
+  if (Array.isArray(angleGaps) && angleGaps.length > 0) {
+    let angle = 0;
+
+    for (let i = 0; i < laneIndex; i += 1) {
+      angle += angleGaps[i % angleGaps.length];
+    }
+
+    return angle % 360;
+  }
+
+  return laneIndex * (360 / laneCount);
 }
 
 export function angleToPoint(cx, cy, angleDegrees, distance) {

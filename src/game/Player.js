@@ -9,7 +9,7 @@ export class Player {
 
   reset() {
     this.x = ARENA.CENTER_X;
-    this.y = ARENA.CENTER_Y + ARENA.RADIUS * 0.52;
+    this.y = ARENA.CENTER_Y + ARENA.RADIUS * 0.3;
     this.radius = ARENA.PLAYER_RADIUS;
   }
 
@@ -46,7 +46,7 @@ export class Player {
       lineWidth: 2,
     });
     drawText(ctx, 'YOU', this.x, this.y - 25, {
-      font: '700 12px system-ui, sans-serif',
+      font: '700 8px system-ui, sans-serif',
       fill: '#fef9c3',
       shadow: true,
     });

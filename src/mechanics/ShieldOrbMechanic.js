@@ -55,6 +55,7 @@ export class ShieldOrbMechanic {
 
   spawnInitialOrbs() {
     this.orbs = [];
+    this.laneColorOrders = this.createLaneColorOrders();
 
     if (!Array.isArray(this.activeLaneIndices) || this.activeLaneIndices.length === 0) {
       return;
@@ -78,7 +79,7 @@ export class ShieldOrbMechanic {
   }
 
   spawnLaneOrbs(laneIndex, orbCount, isAssigned) {
-    const colorsForLane = shuffle([...COLOR_ORDER]);
+    const colorsForLane = this.laneColorOrders[laneIndex];
 
     for (let i = 0; i < orbCount; i += 1) {
       const distanceOffset = i * MECHANIC.ORB_SPACING;
@@ -97,7 +98,11 @@ export class ShieldOrbMechanic {
       return;
     }
 
-    const angle = laneAngle(laneIndex, MECHANIC.LANE_COUNT);
+    const angle = laneAngle(
+      laneIndex,
+      MECHANIC.LANE_COUNT,
+      MECHANIC.LANE_ANGLE_GAPS,
+    );
     const colorId = forcedColorId ?? randomItem(COLOR_ORDER) ?? 'red';
 
     this.orbs.push(
@@ -592,7 +597,7 @@ export class ShieldOrbMechanic {
       lineWidth: 2,
     });
     drawText(ctx, 'BOSS', ARENA.CENTER_X, ARENA.CENTER_Y, {
-      font: '800 15px system-ui, sans-serif',
+      font: '800 12px system-ui, sans-serif',
       fill: '#e0f2fe',
       shadow: true,
     });
@@ -617,5 +622,75 @@ export class ShieldOrbMechanic {
       circleAoEsDroppedTotal: this.circleAoEsDroppedTotal,
       resultMessage: this.resultMessage,
     };
+  }
+
+  sameColorOrder(a, b) {
+    if (!Array.isArray(a) || !Array.isArray(b)) {
+      return false;
+    }
+
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    return a.every((colorId, index) => colorId === b[index]);
+  }
+
+  getColorOrderPermutations() {
+    const [a, b, c] = COLOR_ORDER;
+
+    return [
+      [a, b, c],
+      [a, c, b],
+      [b, a, c],
+      [b, c, a],
+      [c, a, b],
+      [c, b, a],
+    ];
+  }
+
+  createLaneColorOrders() {
+    const permutations = this.getColorOrderPermutations();
+    const laneColorOrders = [];
+
+    const isInvalidAdjacentOrder = (order, adjacentOrder) => {
+      if (!adjacentOrder) {
+        return false;
+      }
+
+      // 첫 번째 오브 색이 같으면 안 됨
+      if (order[0] === adjacentOrder[0]) {
+        return true;
+      }
+
+      // 전체 순서가 같으면 안 됨
+      if (this.sameColorOrder(order, adjacentOrder)) {
+        return true;
+      }
+
+      return false;
+    };
+
+    for (let laneIndex = 0; laneIndex < MECHANIC.LANE_COUNT; laneIndex += 1) {
+      const previousOrder = laneColorOrders[laneIndex - 1];
+
+      let candidates = permutations.filter(
+        (order) => !isInvalidAdjacentOrder(order, previousOrder),
+      );
+
+      // 마지막 라인은 0번 라인과도 인접하므로 0번 라인 조건도 검사
+      if (laneIndex === MECHANIC.LANE_COUNT - 1) {
+        const firstOrder = laneColorOrders[0];
+
+        candidates = candidates.filter(
+          (order) => !isInvalidAdjacentOrder(order, firstOrder),
+        );
+      }
+
+      const selectedOrder = randomItem(candidates) ?? permutations[0];
+      laneColorOrders.push([...selectedOrder]);
+    }
+
+    return laneColorOrders;
   }
 }

@@ -66,14 +66,18 @@ export class ArenaRenderer {
 
     ctx.save();
     for (let i = 0; i < MECHANIC.LANE_COUNT; i += 1) {
-      const angle = laneAngle(i, MECHANIC.LANE_COUNT);
+      const angle = laneAngle(
+        i,
+        MECHANIC.LANE_COUNT,
+        MECHANIC.LANE_ANGLE_GAPS,
+      );
       const start = angleToPoint(ARENA.CENTER_X, ARENA.CENTER_Y, angle, ARENA.BOSS_RADIUS + 18);
       const end = angleToPoint(ARENA.CENTER_X, ARENA.CENTER_Y, angle, ARENA.RADIUS + 44);
       const isActive = activeSet.has(Math.round(angle));
-
-      ctx.strokeStyle = isActive ? 'rgba(250, 204, 21, 0.88)' : 'rgba(148, 163, 184, 0.16)';
-      ctx.lineWidth = isActive ? 3 : 1;
-      ctx.setLineDash(isActive ? [] : [5, 8]);
+      
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 8]);
       ctx.beginPath();
       ctx.moveTo(start.x, start.y);
       ctx.lineTo(end.x, end.y);
@@ -81,8 +85,8 @@ export class ArenaRenderer {
 
       const labelPoint = angleToPoint(ARENA.CENTER_X, ARENA.CENTER_Y, angle, ARENA.RADIUS + 30);
       drawText(ctx, `${angle}°`, labelPoint.x, labelPoint.y, {
-        font: isActive ? '700 12px system-ui, sans-serif' : '11px system-ui, sans-serif',
-        fill: isActive ? '#fde68a' : 'rgba(203, 213, 225, 0.45)',
+        font: '11px system-ui, sans-serif',
+        fill: 'rgba(203, 213, 225, 0.45)',
       });
     }
     ctx.restore();
@@ -91,7 +95,8 @@ export class ArenaRenderer {
       const first = activeAngles[0];
       const second = activeAngles[1];
       const mid = this.getMidAngle(first, second);
-      const label = angleToPoint(ARENA.CENTER_X, ARENA.CENTER_Y, mid, ARENA.RADIUS + 76);
+      const label = angleToPoint(ARENA.CENTER_X, ARENA.CENTER_Y, mid, ARENA.RADIUS + 32);
+
       drawText(ctx, '너의 위치', label.x, label.y, {
         font: '800 16px system-ui, sans-serif',
         fill: '#fef3c7',
@@ -100,10 +105,16 @@ export class ArenaRenderer {
     }
   }
 
-  getMidAngle(a, b) {
-    let diff = b - a;
-    if (diff > 180) diff -= 360;
-    if (diff < -180) diff += 360;
-    return a + diff / 2;
+  normalizeAngle(angle) {
+    return ((angle % 360) + 360) % 360;
+  }
+
+  getShortestAngleDelta(from, to) {
+    return ((to - from + 540) % 360) - 180;
+  }
+
+  getMidAngle(first, second) {
+    const delta = this.getShortestAngleDelta(first, second);
+    return this.normalizeAngle(first + delta / 2);
   }
 }
