@@ -3,22 +3,22 @@ import { angleToPoint, normalize } from '../core/math.js';
 import { drawCircle, drawText } from '../render/draw.js';
 
 export class Orb {
-  constructor({ laneIndex, laneAngleDegrees, colorId, distanceOffset = 0 }) {
+  constructor({ laneIndex, laneAngleDegrees, colorId, distanceOffset = 0, isAssigned = true }) {
     this.laneIndex = laneIndex;
     this.laneAngleDegrees = laneAngleDegrees;
     this.colorId = colorId;
+    this.isAssigned = isAssigned;
     this.radius = MECHANIC.ORB_RADIUS;
     this.hasReachedBoss = false;
     this.wasBeamHit = false;
     this.beamHitFlashTime = 0;
 
-  const start = angleToPoint(
-    ARENA.CENTER_X,
-    ARENA.CENTER_Y,
-    laneAngleDegrees,
-    MECHANIC.ORB_START_DISTANCE + distanceOffset,
-  );
-    
+    const start = angleToPoint(
+      ARENA.CENTER_X,
+      ARENA.CENTER_Y,
+      laneAngleDegrees,
+      MECHANIC.ORB_START_DISTANCE + distanceOffset,
+    );
     this.x = start.x;
     this.y = start.y;
 
@@ -51,6 +51,11 @@ export class Orb {
     const color = COLORS[this.colorId] ?? COLORS.red;
     const flash = this.beamHitFlashTime > 0;
 
+    ctx.save();
+    if (!this.isAssigned) {
+      ctx.globalAlpha = MECHANIC.OUTSIDE_ORB_ALPHA;
+    }
+
     drawCircle(ctx, this.x, this.y, this.radius + (flash ? 8 : 4), {
       fill: color.soft,
       stroke: flash ? '#ffffff' : color.stroke,
@@ -66,6 +71,8 @@ export class Orb {
       fill: '#ffffff',
       shadow: true,
     });
+
+    ctx.restore();
   }
 
   getPosition() {

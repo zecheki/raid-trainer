@@ -8,7 +8,9 @@ export class GameUI {
       targetShield: this.find('targetShield'),
       shieldCount: this.find('shieldCount'),
       nextBeam: this.find('nextBeam'),
+      nextCircleAoe: this.find('nextCircleAoe'),
       beamCount: this.find('beamCount'),
+      orbCount: this.find('orbCount'),
       successRate: this.find('successRate'),
       laneAngles: this.find('laneAngles'),
       logs: this.find('logs'),
@@ -30,7 +32,9 @@ export class GameUI {
     this.setText('targetShield', mechanic.currentShieldName ?? '-');
     this.setText('shieldCount', `${mechanic.shieldCount ?? 0} / 3`);
     this.setText('nextBeam', this.formatSeconds(mechanic.nextBeamSeconds));
+    this.setText('nextCircleAoe', this.formatSeconds(mechanic.nextCircleAoeSeconds));
     this.setText('beamCount', `${mechanic.beamCount ?? 0} / ${mechanic.maxBeams ?? 7}`);
+    this.setText('orbCount', `${mechanic.orbCount ?? 0} / 밖 ${mechanic.outsideOrbCount ?? 0}`);
     this.setText('successRate', this.formatSuccessRate(stats));
     this.setText('laneAngles', activeLaneAngles.length > 0 ? activeLaneAngles.map((angle) => `${angle}°`).join(' / ') : '-');
     this.renderLogs(logs);

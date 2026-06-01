@@ -93,3 +93,46 @@ raid-trainer/
 - 쉴드 테두리 3겹을 보스 쪽으로 더 촘촘하게 배치했습니다.
 - 직선장판이 발사되기 전, 투명도가 점점 진해지는 전조선을 표시합니다.
 - 구슬 판정은 보스 중심부가 아니라 현재 바깥쪽 쉴드 링에 닿는 순간 발생합니다.
+
+## 설정값 위치
+
+주요 난이도 값은 `src/core/constants.js`의 `MECHANIC`에서 조절합니다.
+
+```js
+ORB_SPEED: 42,                         // 구슬 이동 속도
+ORB_START_DISTANCE: ARENA.RADIUS - 128, // 구슬 시작 거리
+ORB_SPACING: 42,                        // 같은 라인 구슬 간격
+ORBS_PER_ACTIVE_LANE: 3,                // 활성 라인당 시작 구슬 수
+ORBS_PER_OUTSIDE_LANE: 3,               // 담당 밖 라인당 반투명 구슬 수
+SHOW_OUTSIDE_ORBS: true,                // 담당 밖 구슬 표시 여부
+OUTSIDE_ORB_ALPHA: 0.28,                // 담당 밖 구슬 투명도
+
+BEAM_INTERVAL: 3,                       // 직선장판 주기
+BEAM_TELEGRAPH_TIME: 0.9,               // 직선장판 전조 시간
+BEAM_LOCK_BEFORE_FIRE: 0.5,             // 발사 전 위치 고정 시간
+BEAM_WIDTH: 24,                         // 직선장판 두께
+
+CIRCLE_AOE_ENABLED: true,             // 원형장판 사용 여부
+CIRCLE_AOE_FIRST_DELAY: 0.8,        // 시작 후 첫 원형장판까지 시간
+CIRCLE_AOE_INTERVAL: 1.0,           // 원형장판 독립 생성 주기
+CIRCLE_AOE_MAX_COUNT: Number.POSITIVE_INFINITY, // 전체 원형장판 최대 횟수. 무제한은 Infinity
+CIRCLE_AOE_RADIUS: 46,              // 원형장판 크기
+CIRCLE_AOE_TELEGRAPH_TIME: 0.75,        // 원형장판 전조 시간
+CIRCLE_AOE_ACTIVE_TIME: 0.22,           // 원형장판 피격 판정 시간
+```
+
+## 최근 추가 반영 사항
+
+- 시작 시 활성 라인마다 구슬 3개를 즉시 생성합니다.
+- 각 라인의 3개 구슬은 빨강/초록/파랑이 각각 하나씩 나오고, 순서만 랜덤입니다.
+- 직선장판은 발사 0.5초 전 위치가 고정됩니다.
+- 직선장판에 플레이어가 맞으면 실패합니다.
+- 원형장판은 직선장판 주기와 무관한 독립 타이머로 계속 떨어집니다.
+- 원형장판은 생성 순간의 플레이어 위치에 고정됩니다.
+- 원형장판 주기와 크기는 `CIRCLE_AOE_INTERVAL`, `CIRCLE_AOE_RADIUS`로 조절합니다.
+- 원형장판 전체 횟수를 제한하려면 `CIRCLE_AOE_MAX_COUNT`를 숫자로 바꾸고, 무제한은 `Number.POSITIVE_INFINITY`로 둡니다.
+
+- 담당 밖 라인의 구슬도 반투명하게 표시합니다.
+- 직선장판이 담당 밖 구슬에 닿으면 즉시 실패합니다.
+- 담당 밖 구슬은 쉴드 판정에는 관여하지 않고, 쉴드에 닿으면 조용히 제거됩니다.
+- 담당 밖 구슬 표시 여부와 투명도는 `SHOW_OUTSIDE_ORBS`, `OUTSIDE_ORB_ALPHA`로 조절합니다.
