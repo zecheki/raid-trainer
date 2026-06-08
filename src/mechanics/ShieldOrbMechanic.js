@@ -1,4 +1,4 @@
-import { ARENA, COLORS, COLOR_ORDER, GAME_STATE, MECHANIC } from '../core/constants.js';
+import { ARENA, COLORS, COLOR_ORDER, DIFFICULTY_OPTION_DEFAULTS, GAME_STATE, MECHANIC } from '../core/constants.js';
 import {
   angleBetweenPoints,
   angleToPoint,
@@ -25,8 +25,28 @@ export class ShieldOrbMechanic {
     this.circleAoEs = [];
     this.circleAoeTimer = MECHANIC.CIRCLE_AOE_FIRST_DELAY;
     this.circleAoEsDroppedTotal = 0;
+    this.difficultyOptions = { ...DIFFICULTY_OPTION_DEFAULTS };
     this.resultMessage = '';
     this.finished = false;
+  }
+
+  setDifficultyOptions(options = {}) {
+    this.difficultyOptions = {
+      ...DIFFICULTY_OPTION_DEFAULTS,
+      ...options,
+    };
+  }
+
+  getOption(name) {
+    return Boolean(this.difficultyOptions?.[name]);
+  }
+
+  isCircleAoeEnabled() {
+    return MECHANIC.CIRCLE_AOE_ENABLED && this.getOption('circleAoeEnabled');
+  }
+
+  shouldSpawnOutsideOrbs() {
+    return MECHANIC.SHOW_OUTSIDE_ORBS && this.getOption('outsideOrbsEnabled');
   }
 
   reset() {
@@ -65,7 +85,7 @@ export class ShieldOrbMechanic {
       this.spawnLaneOrbs(laneIndex, MECHANIC.ORBS_PER_ACTIVE_LANE, true);
     }
 
-    if (MECHANIC.SHOW_OUTSIDE_ORBS) {
+    if (this.shouldSpawnOutsideOrbs()) {
       for (let laneIndex = 0; laneIndex < MECHANIC.LANE_COUNT; laneIndex += 1) {
         if (this.activeLaneIndices.includes(laneIndex)) {
           continue;
@@ -236,7 +256,7 @@ export class ShieldOrbMechanic {
     );
 
     const outsideHit = hitOrbs.find((orb) => !orb.isAssigned);
-    if (outsideHit) {
+    if (outsideHit && this.getOption('outsideOrbBeamHitFails')) {
       this.finished = true;
       return {
         state: GAME_STATE.FAILED,
@@ -245,7 +265,9 @@ export class ShieldOrbMechanic {
     }
 
     for (const orb of hitOrbs) {
-      orb.cycleColor();
+      if (orb.isAssigned) {
+        orb.cycleColor();
+      }
     }
 
     return { state: null, message: null };
@@ -264,7 +286,7 @@ export class ShieldOrbMechanic {
   }
 
   getCircleAoeSpacing() {
-    if (!MECHANIC.CIRCLE_AOE_ENABLED) {
+    if (!this.isCircleAoeEnabled()) {
       return Number.POSITIVE_INFINITY;
     }
 
@@ -295,7 +317,7 @@ export class ShieldOrbMechanic {
   }
 
   updateCircleAoeSpawn(deltaSeconds, playerPosition) {
-    if (!MECHANIC.CIRCLE_AOE_ENABLED) {
+    if (!this.isCircleAoeEnabled()) {
       return;
     }
 
@@ -343,7 +365,7 @@ export class ShieldOrbMechanic {
         ARENA.PLAYER_RADIUS + MECHANIC.BEAM_WIDTH / 2,
       );
 
-      if (playerHitByBeam) {
+      if (playerHitByBeam && this.getOption('beamPlayerHitFails')) {
         this.finished = true;
         return {
           state: GAME_STATE.FAILED,
@@ -355,7 +377,10 @@ export class ShieldOrbMechanic {
     const activeCircle = this.circleAoEs.find((aoe) => this.isCircleAoeActive(aoe));
     if (activeCircle) {
       const distanceFromCenter = Math.hypot(playerPosition.x - activeCircle.x, playerPosition.y - activeCircle.y);
-      if (distanceFromCenter <= activeCircle.radius + ARENA.PLAYER_RADIUS) {
+      if (
+        distanceFromCenter <= activeCircle.radius + ARENA.PLAYER_RADIUS &&
+        this.getOption('circleAoePlayerHitFails')
+      ) {
         this.finished = true;
         return {
           state: GAME_STATE.FAILED,
@@ -471,7 +496,7 @@ export class ShieldOrbMechanic {
   }
 
   getNextCircleAoeSeconds() {
-    if (!MECHANIC.CIRCLE_AOE_ENABLED) {
+    if (!this.isCircleAoeEnabled()) {
       return Number.POSITIVE_INFINITY;
     }
 

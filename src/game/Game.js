@@ -5,6 +5,7 @@ import { Player } from './Player.js';
 import { StatsStore } from './StatsStore.js';
 import { ShieldOrbMechanic } from '../mechanics/ShieldOrbMechanic.js';
 import { GameUI } from '../ui/GameUI.js';
+import { GameOptions } from './GameOptions.js';
 import { drawText, roundedRect } from '../render/draw.js';
 
 export class Game {
@@ -29,7 +30,9 @@ export class Game {
     this.stats = new StatsStore();
     this.player = new Player();
     this.arenaRenderer = new ArenaRenderer();
+    this.options = new GameOptions();
     this.mechanic = new ShieldOrbMechanic();
+    this.mechanic.setDifficultyOptions(this.options.getSnapshot());
     this.mechanic.reset();
     this.ui = new GameUI();
 
@@ -43,6 +46,7 @@ export class Game {
     this.isLoopStarted = false;
 
     this.pushLog('준비 완료: Space로 시작하세요.');
+    this.setDifficultyOptionsEnabled(true);
     this.updateUi();
     this.render();
   }
@@ -124,9 +128,13 @@ export class Game {
       return;
     }
 
+    const difficultyOptions = this.options.getSnapshot();
+
+    this.mechanic.setDifficultyOptions(difficultyOptions);
     this.resetAttempt();
     this.state = GAME_STATE.RUNNING;
     this.hasRecordedCurrentAttempt = false;
+    this.setDifficultyOptionsEnabled(false);
     this.pushLog('시작: 보스 장판 방향을 유도해 구슬 색을 맞추세요.');
     this.updateUi();
   }
@@ -137,6 +145,7 @@ export class Game {
     this.player.reset();
     this.mechanic.reset();
     this.input?.clear();
+    this.setDifficultyOptionsEnabled(true);
     this.pushLog('현재 시도를 초기화했습니다.');
     this.updateUi();
   }
@@ -157,6 +166,7 @@ export class Game {
       this.hasRecordedCurrentAttempt = true;
     }
 
+    this.setDifficultyOptionsEnabled(true);
     this.pushLog(message ?? (nextState === GAME_STATE.SUCCESS ? '성공' : '실패'));
     this.updateUi();
   }
@@ -168,6 +178,10 @@ export class Game {
     const ss = String(now.getSeconds()).padStart(2, '0');
     this.logs.unshift(`[${hh}:${mm}:${ss}] ${message}`);
     this.logs = this.logs.slice(0, 12);
+  }
+
+  setDifficultyOptionsEnabled(enabled) {
+    this.options?.setEnabled(enabled);
   }
 
   getSnapshot() {

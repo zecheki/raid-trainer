@@ -85,6 +85,15 @@ export const MECHANIC = Object.freeze({
   CIRCLE_AOE_ACTIVE_TIME: 0.22,
 });
 
+
+export const DIFFICULTY_OPTION_DEFAULTS = Object.freeze({
+  beamPlayerHitFails: true,
+  circleAoeEnabled: true,
+  circleAoePlayerHitFails: true,
+  outsideOrbsEnabled: true,
+  outsideOrbBeamHitFails: true,
+});
+
 export const PLAYER = Object.freeze({
   SPEED: 120,
 });

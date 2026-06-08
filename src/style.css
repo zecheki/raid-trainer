@@ -164,3 +164,44 @@ dd {
     position: static;
   }
 }
+
+.difficulty-options {
+  margin: 20px 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  display: grid;
+  gap: 10px;
+}
+
+.difficulty-options .option-note {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.difficulty-options label {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.42);
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.35;
+  user-select: none;
+}
+
+.difficulty-options input {
+  margin-top: 2px;
+  accent-color: #facc15;
+}
+
+.difficulty-options.is-locked {
+  opacity: 0.58;
+}
+
+.difficulty-options.is-locked label {
+  cursor: not-allowed;
+}
